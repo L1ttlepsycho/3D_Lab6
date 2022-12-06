@@ -183,6 +183,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gamejudge: {fileID: 0}
   factory: {fileID: 0}
+  kinematic: 0
 --- !u!114 &40192951
 MonoBehaviour:
   m_ObjectHideFlags: 0

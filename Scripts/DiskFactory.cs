@@ -29,8 +29,6 @@ public class DiskFactory: MonoBehaviour
     {
         int disk_num = Random.Range(0,10);
         int color_num = Random.Range(0, 10);
-        //float x_speed = Random.Range(-25, -15);
-        //float y_speed = Random.Range(0, 5);
         float y_pos = Random.Range(8, 15);
 
         GameObject ufo;
@@ -70,7 +68,6 @@ public class DiskFactory: MonoBehaviour
         ufo.transform.localPosition = new Vector3(20, y_pos, 0);
         ufo.GetComponent<Renderer>().material = mat;
         ufo.gameObject.SetActive(false);
-        //ufo.GetComponent<Rigidbody>().velocity = new Vector3(x_speed, y_speed, 0); 
 
         
         Disk disk = new Disk(ufo,mat);

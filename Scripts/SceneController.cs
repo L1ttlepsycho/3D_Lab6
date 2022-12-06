@@ -7,9 +7,11 @@ using System.Linq;
 public class SceneController : MonoBehaviour, IPlayerAction, ISceneController
 {
     private static SceneController instance;
+    private MotionAdapter motionAdapter;
 
     public GameJudge gamejudge;
     public DiskFactory factory;
+    public bool kinematic = true;
 
 
     private Queue<Disk> disk_queue=new Queue<Disk>();
@@ -37,6 +39,14 @@ public class SceneController : MonoBehaviour, IPlayerAction, ISceneController
         director.CurrentScenceController = this;
         gamejudge = GameJudge.getInstance();
         factory = DiskFactory.getInstance();
+        if (kinematic)
+        {
+            motionAdapter = new MotionAdapter(gameObject.AddComponent<DiskPhysics>());
+        }
+        else
+        {
+            motionAdapter = new MotionAdapter(gameObject.AddComponent<DiskBehaviour>());
+        }
         loadResources();
     }
 
@@ -51,7 +61,8 @@ public class SceneController : MonoBehaviour, IPlayerAction, ISceneController
             }
             if (!isPlaying)
             {
-                InvokeRepeating("loadResources", 2f, 2f);
+                // 定时调用
+                InvokeRepeating("loadResources", 3f, 3f);
                 isPlaying = true;
             }
             LaunchDisk();
@@ -66,21 +77,14 @@ public class SceneController : MonoBehaviour, IPlayerAction, ISceneController
         disk_queue.Enqueue(factory.getDisk());
     }
 
-    void wait()
-    {
-        Debug.Log("waiting...");
-    }
 
     public void LaunchDisk()
     {
         if(disk_queue.Count > 0 && gamejudge.trials++<gamejudge.max_trials)
         {
             Disk disk = disk_queue.Dequeue();
-            Debug.Log("Launching...");
-            float x_speed = Random.Range(-25, -15);
-            float y_speed = Random.Range(0, 5);
-            disk.ufo.gameObject.SetActive(true);
-            disk.ufo.GetComponent<Rigidbody>().velocity = new Vector3(x_speed, y_speed, 0);
+            // Debug.Log("Launching...");
+            motionAdapter.launch(disk);
         }       
     }
     
@@ -93,16 +97,16 @@ public class SceneController : MonoBehaviour, IPlayerAction, ISceneController
     {
         if (Input.GetButtonDown("Fire1"))
         {
-            Vector3 mp = Input.mousePosition; //get Screen Position
+            Vector3 mp = Input.mousePosition; // get Screen Position
 
-            //create ray, origin is camera, and direction to mousepoint
+            // create ray, origin is camera, and direction to mousepoint
             Camera ca;
             if (cam != null) ca = cam.GetComponent<Camera>();
             else ca = Camera.main;
 
             Ray ray = ca.ScreenPointToRay(Input.mousePosition);
 
-            //Return the ray's hit
+            // Return the ray's hit
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit))
             {
